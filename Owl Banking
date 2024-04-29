@@ -1,0 +1,146 @@
+import tkinter as tk
+from tkinter import messagebox
+
+
+Money = 0
+Username = ""
+Password = ""
+
+def enable_buttons():
+    butn2.config(state="normal")  
+    butn3.config(state="normal")  
+    butn4.config(state="normal")  
+
+def sign_up():
+    global Username, Password
+    signup_window = tk.Toplevel(root)
+    signup_window.geometry('400x300')
+    signup_window.title('Sign Up')
+
+    username_label = tk.Label(signup_window, text="Username:")
+    username_label.pack()
+    username_entry = tk.Entry(signup_window)
+    username_entry.pack()
+
+    password_label = tk.Label(signup_window, text="Password:")
+    password_label.pack()
+    password_entry = tk.Entry(signup_window)
+    password_entry.pack()
+
+    
+    def submit():
+        global Username, Password
+        Username = username_entry.get()
+        Password = password_entry.get()
+        if len(Username) < 5 or len(Password) < 5:
+            messagebox.showerror("Error", "Username and Password must be at least 5 characters long")
+        else:
+            messagebox.showinfo("Success", f"Welcome {Username} to Owl Bank!")
+            signup_window.destroy()
+            enable_buttons()
+
+    submit_button = tk.Button(signup_window, text="Submit", command=submit)
+    submit_button.pack()
+
+
+
+def deposit():
+    deposit_window = tk.Toplevel(root)
+    deposit_window.geometry('400x300')
+    deposit_window.title('Deposit')
+
+    amount_label = tk.Label(deposit_window, text="Enter amount to deposit:")
+    amount_label.pack()
+    amount_entry = tk.Entry(deposit_window)
+    amount_entry.pack()
+
+    def submit():
+        try:
+            deposit_amount = int(amount_entry.get())
+            if deposit_amount < 0:
+                messagebox.showerror("Error", "Please enter a valid amount to deposit.")
+            else:
+                global Money
+                Money += deposit_amount
+                messagebox.showinfo("Success", f"${deposit_amount} has been deposited into {Username}")
+                deposit_window.destroy()
+        except ValueError:
+            messagebox.showerror("Error", "Please input a valid number!")
+
+
+    submit_button = tk.Button(deposit_window, text="Deposit", command=submit)
+    submit_button.pack()
+
+def withdraw():
+    global Username, Password, Money
+    withdraw_window = tk.Toplevel(root)
+    withdraw_window.geometry('400x300')
+    withdraw_window.title('Withdraw')
+
+    password_label = tk.Label(withdraw_window, text="Enter password:")
+    password_label.pack()
+    password_entry = tk.Entry(withdraw_window)
+    password_entry.pack()
+
+    amount_label = tk.Label(withdraw_window, text="Enter amount to withdraw:")
+    amount_label.pack()
+    amount_entry = tk.Entry(withdraw_window)
+    amount_entry.pack()
+
+    def submit():
+        global Money
+        entered_password = password_entry.get()
+        if entered_password != Password:
+            messagebox.showerror("Error", "Wrong password! Taking you back to home page.")
+            withdraw_window.destroy()
+            return
+
+        try:
+            withdraw_amount = int(amount_entry.get())
+            if withdraw_amount > Money:
+                messagebox.showerror("Error", "You're withdrawing more money than you have!")
+            else:
+                Money -= withdraw_amount
+                messagebox.showinfo("Success", f"${withdraw_amount} has been withdrawn from {Username}. You now have ${Money} left.")
+                withdraw_window.destroy()
+        except ValueError:
+            messagebox.showerror("Error", "Please input a valid number!")
+
+    submit_button = tk.Button(withdraw_window, text="Withdraw", command=submit)
+    submit_button.pack()
+
+def check_balance():
+    balance_window = tk.Toplevel(root)
+    balance_window.geometry('400x300')
+    balance_window.title('Check Balance')
+
+    balance_label = tk.Label(balance_window, text=f'You currently have ${Money} in {Username}')
+    balance_label.pack()
+
+def leave():
+    root.destroy()
+
+root = tk.Tk()
+root.geometry('500x700')
+root.title("Owl Bank")
+
+
+title = tk.Label(root, text='OWL BANKING', font=('Arial', 30))
+title.place(x=115, y=50)
+
+butn1 = tk.Button(root, text='Sign Up', font=('Arial', 18), command=sign_up)
+butn1.place(x=170, y=130, width=169)
+
+butn2 = tk.Button(root, text='Deposit', font=('Arial', 18), command=deposit, state="disabled")
+butn2.place(x=170, y=190, width=169)
+
+butn3 = tk.Button(root, text='Withdraw', font=('Arial', 18), command=withdraw, state="disabled")
+butn3.place(x=170, y=250, width=169)
+
+butn4 = tk.Button(root, text='Check Balance', font=('Arial', 18), command=check_balance, state="disabled")
+butn4.place(x=170, y=310, width=169)
+
+butn5 = tk.Button(root, text='Leave', font=('Arial', 18), command=leave)
+butn5.place(x=170, y=370, width=169)
+
+root.mainloop()
